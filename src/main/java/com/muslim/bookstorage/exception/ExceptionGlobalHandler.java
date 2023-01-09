@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.Map;
 
 @ControllerAdvice
-public class ExceptionUserHandler {
+public class ExceptionGlobalHandler {
     @ExceptionHandler({
             UserNotFoundException.class,
             BookNotFoundException.class
@@ -17,14 +17,17 @@ public class ExceptionUserHandler {
         return response(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> userNameAlreadyExistsExceptionHandler(
-            UserNameAlreadyExistsException exception) {
+    @ExceptionHandler({
+            UserNameAlreadyExistsException.class,
+            NotPdfFormatException.class,
+            EmptyFileException.class
+    })
+    public ResponseEntity<Map<String, String>> badRequestExceptionHandler(RuntimeException exception) {
         return response(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> forbiddenExceptionHandler(ForbiddenException exception){
+    public ResponseEntity<Map<String, String>> forbiddenExceptionHandler(ForbiddenException exception) {
         return response(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
 

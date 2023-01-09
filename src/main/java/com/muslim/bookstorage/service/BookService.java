@@ -9,17 +9,24 @@ import com.muslim.bookstorage.entity.book.Book;
 import com.muslim.bookstorage.entity.book.Genre;
 import com.muslim.bookstorage.exception.BookNotFoundException;
 import com.muslim.bookstorage.exception.ForbiddenException;
+import com.muslim.bookstorage.exception.NotPdfFormatException;
 import com.muslim.bookstorage.security.SecurityUser;
+import com.muslim.bookstorage.utils.FileUtils;
+import lombok.SneakyThrows;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService {
     private final BookDAO bookDAO;
+    private final static String PDF_TYPE = "application/pdf";
 
     public BookService(BookDAO bookDAO) {
         this.bookDAO = bookDAO;
@@ -81,10 +88,45 @@ public class BookService {
         bookDAO.deleteById(id);
     }
 
+    @Transactional
+    public void uploadBook(int id, MultipartFile file) {
+        Book book = bookDAO.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book Not Found"));
+        checkUserNames(book.getUserName());
+        checkPdfFormat(file.getContentType());
+        book.setBookPath(FileUtils.saveFile(file));
+
+        bookDAO.save(book);
+    }
+
+    @SneakyThrows
+    @Transactional
+    public byte[] getBookFile(int id) {
+        Book book = bookDAO.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book Not Found"));
+        if (book.getBookPath() == null) {
+            throw new BookNotFoundException("Book file not found");
+        }
+        if (!isTheSameUser(book.getUserName()) && !book.isPublic()) {
+            throw new ForbiddenException("Forbidden");
+        }
+        return Files.readAllBytes(Path.of(book.getBookPath()));
+    }
+
+    private void checkPdfFormat(String contentType) {
+        if (!PDF_TYPE.equals(contentType)) {
+            throw new NotPdfFormatException("Wrong format type");
+        }
+    }
+
     private void checkUserNames(String userName) {
-        if(!userName.equalsIgnoreCase(currentUsername())) {
+        if (!isTheSameUser(userName)) {
             throw new ForbiddenException("FORBIDDEN");
         }
+    }
+
+    private boolean isTheSameUser(String userName) {
+        return userName.equalsIgnoreCase(currentUsername());
     }
 
     private String currentUsername() {

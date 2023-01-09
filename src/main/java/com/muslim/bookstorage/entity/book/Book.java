@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name="Books")
+@Table(name = "Books")
 @Getter
 @Setter
 public class Book {
@@ -28,6 +28,11 @@ public class Book {
     private String bookPath;
     @Column(name = "user_name")
     private String userName;
+
+    @Transient
+    public boolean isPublic() {
+        return access == Access.PUBLIC;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -16,12 +16,12 @@ public class RegistrationController {
     }
 
     @PostMapping
-    public void registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO){
+    public void registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
         userService.registerUser(userRegistrationDTO);
     }
 
     @GetMapping("activation/{activationUuid}")
-    public void activateUser(@PathVariable String activationUuid){
+    public void activateUser(@PathVariable String activationUuid) {
         userService.activateUser(activationUuid);
     }
 }

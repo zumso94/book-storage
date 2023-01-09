@@ -12,12 +12,12 @@ import java.util.Collections;
 public class SecurityUser extends User {
 
     private SecurityUser(String username,
-                        String password,
-                        boolean enabled,
-                        boolean accountNonExpired,
-                        boolean credentialsNonExpired,
-                        boolean accountNonLocked,
-                        Collection<? extends GrantedAuthority> authorities) {
+                         String password,
+                         boolean enabled,
+                         boolean accountNonExpired,
+                         boolean credentialsNonExpired,
+                         boolean accountNonLocked,
+                         Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
     }
 
