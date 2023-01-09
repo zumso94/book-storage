@@ -30,13 +30,13 @@ public class UserService {
     @Transactional
     public void registerUser(UserRegistrationDTO userRegistrationDTO) {
 
-        if(userDAO.existsByUserName(userRegistrationDTO.getUserName())){
+        if (userDAO.existsByUserName(userRegistrationDTO.getUserName())) {
             throw new UserNameAlreadyExistsException("User name already exists");
         }
 
         String activationUuid = UUID.randomUUID().toString();
         mailSender.send(userRegistrationDTO.getEmail(),
-                        "Account ACTIVATION", "http://192.168.8.100:8080/registration/activation/"+ activationUuid);
+                "Account ACTIVATION", "http://192.168.8.100:8080/registration/activation/" + activationUuid);
 
         User user = new User();
         user.setUserName(userRegistrationDTO.getUserName());
@@ -50,9 +50,9 @@ public class UserService {
     }
 
     @Transactional
-    public void activateUser(String activationUuid){
+    public void activateUser(String activationUuid) {
         User user = userDAO.findByActivationUuid(activationUuid)
-                .orElseThrow(()-> new UserNotFoundException("User with this Uuid Not Found"));
+                .orElseThrow(() -> new UserNotFoundException("User with this Uuid Not Found"));
         user.setStatus(UserStatus.ACTIVE);
         user.setActivationUuid(null);
     }

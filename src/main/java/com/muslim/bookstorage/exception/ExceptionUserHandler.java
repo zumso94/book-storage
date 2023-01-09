@@ -9,8 +9,11 @@ import java.util.Map;
 
 @ControllerAdvice
 public class ExceptionUserHandler {
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> userNotFoundExceptionHandler(UserNotFoundException exception) {
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            BookNotFoundException.class
+    })
+    public ResponseEntity<Map<String, String>> notFoundExceptionHandler(RuntimeException exception) {
         return response(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -18,6 +21,11 @@ public class ExceptionUserHandler {
     public ResponseEntity<Map<String, String>> userNameAlreadyExistsExceptionHandler(
             UserNameAlreadyExistsException exception) {
         return response(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> forbiddenExceptionHandler(ForbiddenException exception){
+        return response(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
 
     private ResponseEntity<Map<String, String>> response(String message, HttpStatus httpStatus) {
