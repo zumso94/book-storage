@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -84,6 +85,13 @@ public class BookService {
         Book book = bookDAO.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book Not Found"));
         checkUserNames(book.getUserName());
+        if (book.getBookPath() != null) {
+            try {
+                Files.deleteIfExists(Path.of(book.getBookPath()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         bookDAO.deleteById(id);
     }
